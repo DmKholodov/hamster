@@ -120,6 +120,13 @@ wait_for_cooldown() {
 # Main script logic
 main() {
     while true; do
+        # Get current balanceCoins
+        current_balance=$(curl -s -X POST \
+            -H "Authorization: $Authorization" \
+            -H "Origin: https://hamsterkombat.io" \
+            -H "Referer: https://hamsterkombat.io/" \
+            https://api.hamsterkombatgame.io/clicker/sync | jq -r '.clickerUser.balanceCoins')
+    
         # Get the best item to buy
         best_item=$(get_best_item)
         best_item_id=$(echo "$best_item" | jq -r '.id')
@@ -134,12 +141,12 @@ main() {
         echo -e "${blue}Profit per Hour: ${cyan}$profit${rest}"
         echo ""
 
-        # Get current balanceCoins
-        current_balance=$(curl -s -X POST \
-            -H "Authorization: $Authorization" \
-            -H "Origin: https://hamsterkombat.io" \
-            -H "Referer: https://hamsterkombat.io/" \
-            https://api.hamsterkombatgame.io/clicker/sync | jq -r '.clickerUser.balanceCoins')
+        # # Get current balanceCoins
+        # current_balance=$(curl -s -X POST \
+        #     -H "Authorization: $Authorization" \
+        #     -H "Origin: https://hamsterkombat.io" \
+        #     -H "Referer: https://hamsterkombat.io/" \
+        #     https://api.hamsterkombatgame.io/clicker/sync | jq -r '.clickerUser.balanceCoins')
 
         # Check if current balance is above the threshold after purchase
         if (( $(echo "$current_balance - $price > $min_balance_threshold" | bc -l) )); then
